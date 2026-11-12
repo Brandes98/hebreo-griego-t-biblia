@@ -366,7 +366,7 @@ button.vn::after{content:"Explicación";font-weight:600;font-size:11px;color:var
   <p><b>Traducciones:</b></p>
   <ul id="credits-versions"></ul>
   <p>En todas las versiones se omiten las notas al pie, las referencias cruzadas y los títulos de sección. El texto bíblico no se modifica.</p>
-<p class="appver">Raíces versión 0.8 <button class="chip" id="reset-app" hidden>Borrar copia guardada y recargar</button></p>
+<p class="appver">Raíces versión 0.9 <button class="chip" id="reset-app" hidden>Borrar copia guardada y recargar</button></p>
   <p><b>Fuentes tipográficas:</b> Gentium Book Plus, Noto Serif Hebrew, Noto Sans Phoenician y Noto Sans (licencia SIL Open Font License).</p>
 </div></section>
 
@@ -782,7 +782,7 @@ function renderRead(){const id=rd.b,ch=BK.c[rd.c-1],o=origFor(id),nt=o==="nt";
    return `<p class="esv ${vid==="vul"?"lat":""}">${multi?`<span class="vtag">${esc(vid==="rv1909"?"RV1909":vName(vid).split(" (")[0])}</span>`:""}${txt}</p>`}).join("");
   const vnt=vvc&&vvc[String(vn)];const ed=edition||"prot";
   const vnum=vnt?`<button class="vn" data-vn="${vn}" aria-label="Explicación del versículo ${vn}">${vn}</button>`:`<div class="vn">${vn}</div>`;
-  const inline=vnt?`<div class="vnote">${esc(vnt.n)}${vnt.t&&vnt.t[ed]?`<span class="vt"><b>${TNAME[ed]}:</b> ${esc(vnt.t[ed])}</span><button class="more" data-vn="${vn}">Ver las otras tradiciones</button>`:""}</div>`:"";
+  const inline=vnt?`<div class="vnote">${esc(vnt.n)}${vnt.t&&vnt.t.all?`<span class="vt"><b>Lo que comparten las tradiciones:</b> ${esc(vnt.t.all)}</span>`:vnt.t&&vnt.t[ed]?`<span class="vt"><b>${TNAME[ed]}:</b> ${esc(vnt.t[ed])}</span><button class="more" data-vn="${vn}">Ver las otras tradiciones</button>`:""}</div>`:"";
   return `<div class="vs" id="v${vn}">${vnum}${orig}${es}${inline}</div>`}).join("");
  const prev=rd.c>1,next=rd.c<BK.c.length;
  let note="";
