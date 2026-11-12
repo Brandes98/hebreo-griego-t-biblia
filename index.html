@@ -201,6 +201,18 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .ctx-others .ctx-theo{border-left-color:var(--line);margin-top:8px}
 .ctx-others .ctx-theo h3{color:var(--muted)}
 .ctx-warn{font-size:12px;color:var(--muted);margin-top:22px}
+.ctx-tabs{display:flex;gap:0;margin:2px 0 10px}
+.ctx-tabs .chip:first-child{border-radius:999px 0 0 999px}.ctx-tabs .chip:last-child{border-radius:0 999px 999px 0;margin-left:-1px}
+.ch-banner{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--gold-soft);border-radius:12px;padding:10px 14px;margin:2px 0 6px}
+.ch-banner b{display:block;font-size:14px}.ch-banner small{display:block;color:var(--muted);font-size:12px}.ch-banner .chev{margin-left:auto}
+.warn-list{display:grid;gap:10px}
+.warn{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:10px 14px}
+.warn .vref{font-weight:700;font-size:13px;color:var(--gold);background:none;padding:0;margin-bottom:4px;display:inline-block}
+.warn button.vref{text-decoration:underline;text-underline-offset:3px}
+.warn p{margin:0;font-size:15px;line-height:1.5;font-family:var(--f-ui)}
+.chap.hasctx::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:3px auto 0}
+.vs.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{background:var(--gold-soft)}100%{background:transparent}}
 .save-all{display:block;width:100%;margin-top:8px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:14px;text-align:left}
 .save-all.ok{border-style:solid;color:var(--accent)}
 .bible-card{background:var(--accent);color:var(--surface);border-radius:16px;padding:18px 16px;margin-top:8px;display:grid;gap:12px}
@@ -344,7 +356,8 @@ h1,h2,h3{text-wrap:balance;margin:0}
   <p><b>Traducciones:</b></p>
   <ul id="credits-versions"></ul>
   <p>En todas las versiones se omiten las notas al pie, las referencias cruzadas y los títulos de sección. El texto bíblico no se modifica.</p>
-<p><b>Fuentes tipográficas:</b> Gentium Book Plus, Noto Serif Hebrew, Noto Sans Phoenician y Noto Sans (licencia SIL Open Font License).</p>
+<p class="appver">Raíces versión 0.6 <button class="chip" id="reset-app" hidden>Borrar copia guardada y recargar</button></p>
+  <p><b>Fuentes tipográficas:</b> Gentium Book Plus, Noto Serif Hebrew, Noto Sans Phoenician y Noto Sans (licencia SIL Open Font License).</p>
 </div></section>
 
 <div class="sheet-bg" id="sheet-bg"></div>
@@ -352,6 +365,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 
 <script src="bible/index.js"></script>
 <script src="bible/extra.js"></script>
+<script src="bible/ch/index.js"></script>
 <script>
 /* ===== DATOS ===== */
 const GREEK=[
@@ -687,9 +701,10 @@ function openBooks(ot){$("books-title").textContent=ot?"Antiguo Testamento":"Nue
  $("books-list").querySelectorAll(".book").forEach(x=>x.onclick=()=>openChaps(x.dataset.b));show("s-books")}
 function openChaps(id){const n=chapCount(id);const last=store.get("rd:last",null);
  $("chaps-ctx").onclick=()=>openCtx(id);
+ $("chaps-ctx-sub").textContent=hasChCtx(id)?"Ficha del libro y de cada capítulo (marcados con un punto)":"Quién lo escribió, cuándo, para quién y por qué";
  $("chaps-title").textContent=bookName(id);
  $("chaps-list").innerHTML=Array.from({length:n},(_,i)=>{const g=id==="PSA"&&edition!=="prot"?psLxx(i+1):null;
-  return `<button class="chap ${last&&last[0]===id&&last[1]===i+1?"last":""}" data-c="${i+1}">${i+1}${g?`<small>${g}</small>`:""}</button>`}).join("");
+  return `<button class="chap ${last&&last[0]===id&&last[1]===i+1?"last":""} ${hasChCtx(id)?"hasctx":""}" data-c="${i+1}">${i+1}${g?`<small>${g}</small>`:""}</button>`}).join("");
  $("chaps-list").querySelectorAll(".chap").forEach(x=>x.onclick=()=>{
   if(document.querySelector(".screen.on").id==="s-chaps"&&hist[hist.length-1]==="s-read"){hist.pop();openRead(id,+x.dataset.c,false)}else openRead(id,+x.dataset.c)});
  show("s-chaps")}
@@ -754,9 +769,11 @@ function renderRead(){const id=rd.b,ch=BK.c[rd.c-1],o=origFor(id),nt=o==="nt";
   return `<div class="vs" id="v${vn}"><div class="vn">${vn}</div>${orig}${es}</div>`}).join("");
  const prev=rd.c>1,next=rd.c<BK.c.length;
  let note="";
+ if(hasChCtx(id))note+=`<button class="ch-banner" id="ch-banner"><span><b>Contexto de ${esc(chapTitle(id,rd.c))}</b><small>Cultura, por qué se enseña y cómo no sacarlo de contexto</small></span><span class="chev">›</span></button>`;
  if(ev.fallback)note+=`<p class="rdnote">Tus versiones elegidas no incluyen este libro: se muestra la ${esc(vName(ev.list[0]))}.</p>`;
  if(o==="lxx"&&!anyLxx&&!nt)note+=`<p class="rdnote">La Septuaginta ordena este pasaje de otra manera${id==="PRO"?" (Proverbios 30 y 31 están repartidos en los capítulos 24 y 29 del griego)":""}. Podés leerlo en hebreo con el botón «Hebreo».</p>`;
  body.innerHTML=note+vs+`<div class="rd-nav">${prev?`<button class="btn ghost" id="rd-prev">‹ Capítulo ${rd.c-1}</button>`:""}${next?`<button class="btn" id="rd-next">Capítulo ${rd.c+1} ›</button>`:""}</div>`;
+ if($("ch-banner"))$("ch-banner").onclick=()=>openCtx(id,rd.c);
  if(prev)$("rd-prev").onclick=()=>{rd.c--;store.set("rd:last",[rd.b,rd.c]);renderCont();renderRead();window.scrollTo(0,0)};
  if(next)$("rd-next").onclick=()=>{rd.c++;store.set("rd:last",[rd.b,rd.c]);renderCont();renderRead();window.scrollTo(0,0)}}
 function clearHl(){document.querySelectorAll("#rd-body .hl").forEach(x=>x.classList.remove("hl"))}
@@ -778,24 +795,54 @@ async function rdGreek(vi,gi,btn){clearHl();btn.classList.add("hl");const w=btn.
    <div class="strong">Strong G${st}</div>`
   :`<div class="note">Todavía no tenemos el análisis de esta palabra. El texto griego de la Septuaginta llega sin etiquetas de gramática; las agregaremos más adelante.</div>`}`)}
 
-/* --- Contexto histórico del libro --- */
+/* --- Contexto: ficha del capítulo y del libro --- */
 const TNAME={cat:"Lectura católica",ort:"Lectura ortodoxa",prot:"Lectura protestante"};
-async function openCtx(id){
+const CHX_DATA={};window.CHX=d=>{CHX_DATA[d.b]=d.c};
+const hasChCtx=id=>(window.CHBOOKS||[]).includes(id==="DAC"?"DAN":id==="ESC"?"EST":id);
+async function getChCtx(id){const k=id==="DAC"?"DAN":id==="ESC"?"EST":id;if(!hasChCtx(id))return null;
+ if(!CHX_DATA[k]){try{await loadScript("bible/ch/"+k+".js")}catch(e){return null}}return CHX_DATA[k]}
+let ctxState={id:null,c:null,tab:"ch"};
+function theoHtml(t){const ed=edition||"prot";
+ if(t.all)return `<div class="ctx-theo"><h3>Lo que comparten las tradiciones</h3><p>${esc(t.all)}</p></div>`;
+ const others=Object.keys(TNAME).filter(k=>k!==ed&&t[k]);
+ return `${t[ed]?`<div class="ctx-theo"><h3>${TNAME[ed]}</h3><p>${esc(t[ed])}</p><p class="hint">Según la tradición que elegiste en la app.</p></div>`:""}
+  ${others.length?`<details class="ctx-others"><summary>Ver cómo lo leen otras tradiciones</summary>${others.map(k=>`<div class="ctx-theo"><h3>${TNAME[k]}</h3><p>${esc(t[k])}</p></div>`).join("")}</details>`:""}`}
+async function openCtx(id,c,tab){
  if(typeof window.CTX==="undefined"){try{await loadScript("bible/context.js")}catch(e){}}
- const c=(window.CTX||{})[id];$("ctx-title").textContent="Contexto";
- if(!c){$("ctx-body").innerHTML=`<p class="loading">Todavía no hay ficha para este libro.</p>`;show("s-ctx");return}
- const ed=edition||"prot";const others=Object.keys(TNAME).filter(k=>k!==ed&&c.t[k]);
- $("ctx-body").innerHTML=`<div class="ctx-hero"><div class="ref">${isNT(id)?"Nuevo Testamento":"Antiguo Testamento"}</div><h1>${esc(bookName(id))}</h1></div>
-  <div class="ctx-facts"><div class="fact wide"><span>Autor</span><p>${esc(c.a)}</p></div><div class="fact"><span>Fecha</span><p>${esc(c.f)}</p></div><div class="fact"><span>Para quién</span><p>${esc(c.d)}</p></div></div>
-  <div class="ctx-sec"><h3>Qué estaba pasando</h3><p>${esc(c.h)}</p></div>
-  <div class="ctx-sec"><h3>Por qué se escribió</h3><p>${esc(c.p)}</p></div>
-  <div class="ctx-sec"><h3>Cómo está organizado</h3><ol>${c.e.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>
-  <div class="ctx-sec"><h3>Dato curioso</h3><p>${esc(c.c)}</p></div>
-  ${c.t[ed]?`<div class="ctx-theo"><h3>${TNAME[ed]}</h3><p>${esc(c.t[ed])}</p><p class="hint">Según la tradición que elegiste en la app.</p></div>`:""}
-  ${others.length?`<details class="ctx-others"><summary>Ver cómo lo leen otras tradiciones</summary>${others.map(k=>`<div class="ctx-theo"><h3>${TNAME[k]}</h3><p>${esc(c.t[k])}</p></div>`).join("")}</details>`:""}
-  <p class="ctx-warn">Las fechas y los autores de muchos libros se discuten. Esta ficha resume lo que dice la tradición y lo que piensan muchos historiadores, sin decidir quién tiene la razón.</p>`;
- show("s-ctx")}
-$("rd-ctx").onclick=()=>openCtx(rd.b);
+ const chs=c?await getChCtx(id):null;const chc=chs&&chs[String(c)];
+ const cur=document.querySelector(".screen.on").id;
+ ctxState={id,c,tab:tab||(chc?"ch":"book"),fromReader:cur==="s-read"||(cur==="s-ctx"&&ctxState.fromReader)};if(!chc)ctxState.tab="book";
+ renderCtx();if(document.querySelector(".screen.on").id!=="s-ctx")show("s-ctx");else window.scrollTo(0,0)}
+function renderCtx(){const {id,c,tab}=ctxState;const chs=CHX_DATA[id==="DAC"?"DAN":id==="ESC"?"EST":id];const chc=chs&&c?chs[String(c)]:null;
+ $("ctx-title").textContent="Contexto";
+ const tabs=chc?`<div class="ctx-tabs"><button class="chip" aria-pressed="${tab==="ch"}" data-tab="ch">Este capítulo</button><button class="chip" aria-pressed="${tab==="book"}" data-tab="book">El libro</button></div>`:"";
+ let html="";
+ if(tab==="ch"&&chc){
+  const fromReader=ctxState.fromReader&&rd.b===id&&rd.c===c;
+  html=`<div class="ctx-hero"><div class="ref">${esc(bookName(id))}</div><h1>Capítulo ${c}</h1></div>${tabs}
+   <div class="ctx-sec"><h3>De qué trata</h3><p>${esc(chc.r)}</p></div>
+   <div class="ctx-sec"><h3>Contexto cultural</h3><p>${esc(chc.c)}</p></div>
+   <div class="ctx-sec"><h3>Por qué se enseña esto</h3><p>${esc(chc.p)}</p></div>
+   ${chc.w&&chc.w.length?`<div class="ctx-sec"><h3>Cuidado al leerlo</h3><div class="warn-list">${chc.w.map(w=>{const vv=parseInt(String(w[0]).split(":")[1]);
+     return `<div class="warn">${fromReader&&String(w[0]).startsWith(c+":")?`<button class="vref" data-v="${vv}">${esc(bookName(id))} ${esc(w[0])}</button>`:`<span class="vref">${esc(bookName(id))} ${esc(w[0])}</span>`}<p>${esc(w[1])}</p></div>`}).join("")}</div></div>`:""}
+   ${theoHtml(chc.t)}
+   ${chc.x&&chc.x.length?`<div class="ctx-sec"><h3>Pasajes relacionados</h3><p style="font-family:var(--f-ui);font-size:15px">${chc.x.map(esc).join(" · ")}</p></div>`:""}
+   <p class="ctx-warn">Esta ficha explica el contexto para leer el capítulo sin sacarlo de su sentido. Donde las tradiciones difieren, se muestra la tuya y podés ver las otras.</p>`;
+ }else{
+  const k=(window.CTX||{})[id];
+  if(!k){html=`<p class="loading">Todavía no hay ficha para este libro.</p>`}
+  else html=`<div class="ctx-hero"><div class="ref">${isNT(id)?"Nuevo Testamento":"Antiguo Testamento"}</div><h1>${esc(bookName(id))}</h1></div>${tabs}
+  <div class="ctx-facts"><div class="fact wide"><span>Autor</span><p>${esc(k.a)}</p></div><div class="fact"><span>Fecha</span><p>${esc(k.f)}</p></div><div class="fact"><span>Para quién</span><p>${esc(k.d)}</p></div></div>
+  <div class="ctx-sec"><h3>Qué estaba pasando</h3><p>${esc(k.h)}</p></div>
+  <div class="ctx-sec"><h3>Por qué se escribió</h3><p>${esc(k.p)}</p></div>
+  <div class="ctx-sec"><h3>Cómo está organizado</h3><ol>${k.e.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>
+  <div class="ctx-sec"><h3>Dato curioso</h3><p>${esc(k.c)}</p></div>
+  ${theoHtml(k.t)}
+  <p class="ctx-warn">Las fechas y los autores de muchos libros se discuten. Esta ficha resume lo que dice la tradición y lo que piensan muchos historiadores, sin decidir quién tiene la razón.</p>`}
+ $("ctx-body").innerHTML=html;
+ $("ctx-body").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ctxState.tab=b.dataset.tab;renderCtx();window.scrollTo(0,0)});
+ $("ctx-body").querySelectorAll("button.vref").forEach(b=>b.onclick=()=>{const v=b.dataset.v;uiBack();setTimeout(()=>{const el=$("v"+v);if(el){el.scrollIntoView({block:"center"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}},WEB?250:60)})}
+$("rd-ctx").onclick=()=>openCtx(rd.b,rd.c);
 
 function rdWord(vi,wi,btn){const v=BK.c[rd.c-1][vi];const w=v[1][wi];const ot=!isNT(rd.b);const lng=ot?"he":"gr";
  const L=LX[(ot?"H":"G")+w[2]];
@@ -819,20 +866,26 @@ function rdWord(vi,wi,btn){const v=BK.c[rd.c-1][vi];const w=v[1][wi];const ot=!i
   ${w[2]?`<div class="strong">Strong ${ot?"H":"G"}${w[2]}</div>`:""}`)}
 
 applyPaleo();renderHome();renderEdition();renderCont();
+if(WEB&&"serviceWorker" in navigator){const rb=$("reset-app");rb.hidden=false;rb.onclick=async()=>{rb.textContent="Recargando…";
+ try{const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister()));const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)))}catch(e){}
+ try{Object.keys(localStorage).filter(k=>k.startsWith("raices:saved")).forEach(k=>localStorage.removeItem(k))}catch(e){}
+ location.reload()}}
 $("credits-versions").innerHTML=VERSIONS.map(v=>`<li><b>${esc(v.name)}:</b> ${esc(v.credit)}</li>`).join("");
 if(WEB&&"serviceWorker" in navigator){
- addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+ addEventListener("load",()=>navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{}));
+ let reloaded=false;const hadCtrl=!!navigator.serviceWorker.controller;
+ navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
  const sa=$("save-all");sa.hidden=false;
  const setSaved=()=>{sa.classList.add("ok");sa.textContent="✓ La Biblia completa está guardada en este dispositivo y funciona sin internet."};
- if(store.get("saved:"+edition,false))setSaved();else sa.textContent="Guardar la Biblia para leerla sin internet (texto original y tus versiones elegidas)";
+ if(store.get("saved:"+edition+":w4",false))setSaved();else sa.textContent="Guardar la Biblia para leerla sin internet (texto original y tus versiones elegidas)";
  sa.onclick=async()=>{if(sa.classList.contains("ok"))return;
   try{const reg=await navigator.serviceWorker.ready;sa.textContent="Preparando la descarga…";const ids=[...(edition?ED().ot:BOOKS.slice(0,39).map(b=>b[0])),...NT_IDS];
-   const extra=["bible/extra.js","bible/forms.js","bible/context.js"];
+   const extra=["bible/extra.js","bible/forms.js","bible/context.js","bible/ch/index.js",...(window.CHBOOKS||[]).map(b=>"bible/ch/"+b+".js")];
    ids.forEach(id=>{if(!isNT(id))extra.push("bible/lxx/"+id+".js");selVersions().forEach(v=>{if(v!=="rv1909"&&availableIn(v,id))extra.push(`bible/v/${v}/${id}.js`)})});
    reg.active.postMessage({type:"save-all",books:ids.map(id=>"bible/"+id+".js"),extra})}
   catch(e){sa.textContent="No se pudo guardar. Revisá tu conexión e intentá de nuevo."}};
  navigator.serviceWorker.addEventListener("message",e=>{const d=e.data||{};
-  if(d.type==="save-progress"){if(d.done>=d.total){store.set("saved:"+edition,true);setSaved()}else sa.textContent=`Guardando la Biblia… ${Math.round(d.done*100/d.total)} %`}
+  if(d.type==="save-progress"){if(d.done>=d.total){store.set("saved:"+edition+":w4",true);setSaved()}else sa.textContent=`Guardando la Biblia… ${Math.round(d.done*100/d.total)} %`}
   if(d.type==="save-error")sa.textContent="Se cortó la conexión. Tocá aquí para seguir guardando."});
 }
 </script>
