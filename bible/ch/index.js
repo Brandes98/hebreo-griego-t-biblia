@@ -1,1 +1,1 @@
-CHBOOKS=["JHN"];
+CHBOOKS=["JHN", "MRK"];
