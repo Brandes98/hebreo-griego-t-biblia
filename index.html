@@ -157,6 +157,26 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .paleo .he-t{font-family:var(--f-paleo)}
 .dir{font-size:13px;color:var(--gold);font-weight:600;margin:-4px 0 8px}
 /* Biblia */
+.ed-chip{margin-top:10px;background:color-mix(in srgb,var(--surface) 16%,transparent);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+.edlist{display:grid;gap:8px;margin-top:6px}
+.edopt{text-align:left;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+.edopt b{display:block;font-size:16px}
+.edopt small{color:var(--muted);font-size:13px;line-height:1.35;display:block;margin-top:2px}
+.edopt.on{border:2px solid var(--accent);background:var(--accent-soft)}
+.edopt[data-na]{opacity:.55}
+.dtag{display:block;margin:2px 0 0!important;font-style:normal;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gold);margin-left:6px;vertical-align:2px}
+.chap small{display:block;font-size:10px;font-weight:500;color:var(--muted)}
+.seg{display:inline-flex;gap:0}
+.seg .chip:first-child{border-radius:999px 0 0 999px}.seg .chip:last-child{border-radius:0 999px 999px 0;margin-left:-1px}
+.vchip{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.orig.lxx .w .o{font-size:21px}
+.gref{font-size:11px;color:var(--gold);font-weight:700;align-self:center;margin-right:4px}
+.nogr{font-size:13px;color:var(--muted);font-style:italic;margin:4px 0}
+.vtag{display:inline-block;font-family:var(--f-ui);font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-right:6px;vertical-align:2px}
+.esv+.esv{margin-top:4px}
+.esv.lat{font-style:italic}
+.muted{color:var(--muted);font-size:14px}
+.rdnote{background:var(--gold-soft);border-radius:12px;padding:10px 12px;font-size:14px;margin:4px 0 8px}
 .save-all{display:block;width:100%;margin-top:8px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:14px;text-align:left}
 .save-all.ok{border-style:solid;color:var(--accent)}
 .bible-card{background:var(--accent);color:var(--surface);border-radius:16px;padding:18px 16px;margin-top:8px;display:grid;gap:12px}
@@ -216,7 +236,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
     <p class="tag">Aprendé a leer la Biblia en hebreo y en griego, paso a paso y en español sencillo.</p>
   </div>
   <div class="bible-card">
-    <div><h3>La Biblia</h3><p>Texto original completo con la Reina-Valera 1909. Tocá cualquier palabra.</p></div>
+    <div><h3>La Biblia</h3><p>Texto original completo con traducciones al español. Tocá cualquier palabra.</p><button class="ed-chip" id="ed-chip"></button></div>
     <div class="bible-btns">
       <button id="go-ot">Antiguo Testamento<small>Hebreo · 39 libros</small></button>
       <button id="go-nt">Nuevo Testamento<small>Griego · 27 libros</small></button>
@@ -288,15 +308,19 @@ h1,h2,h3{text-wrap:balance;margin:0}
   <div class="top"><button class="back" data-back aria-label="Volver">‹</button><h2>Fuentes y créditos</h2></div>
   <p><b>Texto hebreo y griego, con su gramática y traducción literal palabra por palabra:</b> datos TAHOT y TAGNT de STEPBible.org, de Tyndale House, Cambridge (licencia CC BY 4.0). Fuente: STEPBible.github.io/STEPBible-Data.</p>
   <p>Cambios hechos en Raíces: las descripciones de gramática se tradujeron al español, la transliteración se adaptó a la pronunciación en español y cada palabra se conectó con su frase en la Reina-Valera 1909 usando los números Strong.</p>
-  <p><b>Texto hebreo:</b> Códice de Leningrado (Westminster Leningrad Codex). <b>Texto griego:</b> se muestran las palabras de las ediciones críticas modernas (NA28) y del Texto Recibido (TR). Las que aparecen solo en una de las dos se ven más claras.</p>
-  <p><b>Texto en español:</b> Reina-Valera 1909, de dominio público, en la edición de eBible.org.</p>
-  <p><b>Fuentes tipográficas:</b> Gentium Book Plus, Noto Serif Hebrew, Noto Sans Phoenician y Noto Sans (licencia SIL Open Font License).</p>
+  <p><b>Texto hebreo:</b> Códice de Leningrado (Westminster Leningrad Codex). <b>Texto griego del Nuevo Testamento:</b> se muestran las palabras de las ediciones críticas modernas (NA28) y del Texto Recibido (TR); las que aparecen solo en una de las dos se ven más claras.</p>
+  <p><b>Septuaginta (Antiguo Testamento en griego):</b> edición de Orthodox Media Network (Monte Athos), dominio público, vía eBible.org. 2 Macabeos y la Oración de Manasés vienen de la Septuaginta de Brenton (1851, dominio público). La correspondencia de versículos con las Biblias en español usa la tabla TVTMS de STEPBible.org (CC BY 4.0).</p>
+  <p><b>Traducciones:</b></p>
+  <ul id="credits-versions"></ul>
+  <p>En todas las versiones se omiten las notas al pie, las referencias cruzadas y los títulos de sección. El texto bíblico no se modifica.</p>
+<p><b>Fuentes tipográficas:</b> Gentium Book Plus, Noto Serif Hebrew, Noto Sans Phoenician y Noto Sans (licencia SIL Open Font License).</p>
 </div></section>
 
 <div class="sheet-bg" id="sheet-bg"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheet-body"></div></div>
 
 <script src="bible/index.js"></script>
+<script src="bible/extra.js"></script>
 <script>
 /* ===== DATOS ===== */
 const GREEK=[
@@ -534,67 +558,195 @@ let y0=null;$("sheet").addEventListener("touchstart",e=>{y0=$("sheet").scrollTop
 $("sheet").addEventListener("touchend",e=>{if(y0!=null&&e.changedTouches[0].clientY-y0>70)dismissSheet();y0=null});
 
 /* ===== BIBLIA ===== */
-let BK=null,LX=null;
-window.BOOK=d=>{BK=d};window.LEX=d=>{LX=d};
-const rd={b:null,c:1,tr:store.get("rd:tr",false),gl:store.get("rd:gl",true),vow:store.get("rd:vow",true)};
+let BK=null,LX=null,LXC=null;const VT={};
+window.BOOK=d=>{BK=d};window.LEX=d=>{LX=d};window.LXXB=d=>{LXC=d};window.VTEXT=d=>{VT[d.v]=d};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const stripVowels=s=>s.replace(/[ְ-ׇּׁׂ]/g,"");
 function loadScript(src){return new Promise((ok,err)=>{const s=document.createElement("script");s.src=src;s.onload=()=>{s.remove();ok()};s.onerror=()=>{s.remove();err(new Error(src))};document.head.appendChild(s)})}
-async function getBook(id){if(!BK||BK.id!==id){BK=null;await loadScript("bible/"+id+".js")}return BK}
 async function getLex(){if(!LX)await loadScript("bible/lex.js");if(typeof MORPH==="undefined")await loadScript("bible/morph.js")}
-const bookName=id=>(BOOKS.find(b=>b[0]===id)||[id,id])[1];
 
+/* --- Tradiciones: canon, orden y nombres --- */
+const DEUT=["TOB","JDT","ESC","1MA","2MA","WIS","SIR","BAR","DAC","1ES","3MA","4MA","MAN","PS2"];
+const NT_IDS=BOOKS.slice(39).map(b=>b[0]);
+const EDITIONS={
+ prot:{name:"Protestante",desc:"66 libros. Antiguo Testamento traducido del hebreo.",orig:"heb",def:["rv1909"],
+  ot:BOOKS.slice(0,39).map(b=>b[0])},
+ cat:{name:"Católica",desc:"73 libros: incluye Tobías, Judit, Macabeos, Sabiduría, Eclesiástico, Baruc y las partes griegas de Ester y Daniel.",orig:"heb",def:["bll"],
+  ot:"GEN EXO LEV NUM DEU JOS JDG RUT 1SA 2SA 1KI 2KI 1CH 2CH EZR NEH TOB JDT ESC 1MA 2MA JOB PSA PRO ECC SNG WIS SIR ISA JER LAM BAR EZK DAC HOS JOL AMO OBA JON MIC NAM HAB ZEP HAG ZEC MAL".split(" "),
+  names:{SIR:"Eclesiástico",ECC:"Eclesiastés"}},
+ ort:{name:"Ortodoxa",desc:"Antiguo Testamento de la Septuaginta griega: suma 1 Esdras, 3 Macabeos, la Oración de Manasés, el Salmo 151 y 4 Macabeos (apéndice).",orig:"lxx",def:["bll"],
+  ot:"GEN EXO LEV NUM DEU JOS JDG RUT 1SA 2SA 1KI 2KI 1CH 2CH MAN 1ES EZR NEH TOB JDT ESC 1MA 2MA 3MA PSA PS2 JOB PRO ECC SNG WIS SIR HOS AMO MIC JOL OBA JON NAM HAB ZEP HAG ZEC MAL ISA JER BAR LAM EZK DAC 4MA".split(" "),
+  names:{"1SA":"1 Samuel (1 Reinos)","2SA":"2 Samuel (2 Reinos)","1KI":"1 Reyes (3 Reinos)","2KI":"2 Reyes (4 Reinos)","1CH":"1 Crónicas (1 Paralipómenos)","2CH":"2 Crónicas (2 Paralipómenos)","EZR":"Esdras (2 Esdras)","SIR":"Sirácida","4MA":"4 Macabeos (apéndice)"}}
+};
+let edition=store.get("edition",null);
+const ED=()=>EDITIONS[edition||"prot"];
+function baseInfo(id){const b=BOOKS.find(x=>x[0]===id);if(b)return[b[1],b[2]];const e=EXTRA[id];return e?[e[0],e[1]]:[id,1]}
+const bookName=id=>(ED().names||{})[id]||baseInfo(id)[0];
+const chapCount=id=>baseInfo(id)[1];
+const isNT=id=>NT_IDS.includes(id), isDeut=id=>DEUT.includes(id);
+const hasHeb=id=>!isNT(id)&&!isDeut(id)||id==="DAC";
+
+/* --- Versiones en español (y latín) --- */
+const VERSIONS=[
+ {id:"rv1909",name:"Reina-Valera 1909",desc:"Clásica. Es la que se conecta palabra por palabra con el hebreo y el griego.",credit:"Dominio público (eBible.org)."},
+ {id:"nbv",name:"Nueva Biblia Viva",desc:"Moderna y fácil de entender.",credit:"Biblica® Open Nueva Biblia Viva™ © 2006, 2008 Biblica, Inc. Licencia CC BY-SA 4.0."},
+ {id:"pdt",name:"Palabra de Dios para ti",desc:"Español latinoamericano sencillo.",credit:"© 2020 Asociación Bíblica Latinoamericana. Licencia CC BY 4.0."},
+ {id:"bes",name:"La Biblia en Español Sencillo",desc:"Muy simple, ideal para empezar.",credit:"AudioBiblia.org (Irma Flores). Dominio público."},
+ {id:"vbl",name:"Versión Biblia Libre",desc:"Moderna y cercana al original.",credit:"© 2018-2020 Jonathan Gallagher y Shelly Barrios de Avila. Licencia CC BY-SA 4.0."},
+ {id:"rvg",name:"Reina-Valera Gómez",desc:"Revisión conservadora de la Reina-Valera.",credit:"© 2004, 2010, 2023 Dr. Humberto Gómez Caballero. Se permite su distribución gratuita sin cambiar el texto."},
+ {id:"v1602p",name:"Valera 1602 Purificada",desc:"Revisión de la Valera de 1602.",credit:"© 2007, 2019, 2024 Iglesia Bautista Bíblica de la Gracia. Reproducción sin fines de lucro y sin alterar el texto."},
+ {id:"bll",name:"Biblia Libre Latinoamericana",desc:"Incluye todos los libros católicos y ortodoxos. Borrador en revisión.",credit:"Dominio público. Borrador en revisión (eBible.org)."},
+ {id:"blm",name:"Biblia Libre para el Mundo",desc:"Español de España. Incluye todos los libros católicos y ortodoxos. Borrador en revisión.",credit:"David Williams y Michael Paul Johnson. Dominio público. Borrador en revisión."},
+ {id:"vul",name:"Vulgata Clementina (latín)",desc:"La Biblia latina histórica de la Iglesia católica (1592).",credit:"Dominio público (eBible.org).",only:["cat"]}
+];
+const FULLCANON=["bll","blm"];
+function versionsFor(){return VERSIONS.filter(v=>!v.only||v.only.includes(edition))}
+function availableIn(vid,id){if(isNT(id))return true;
+ if(vid==="rv1909")return !isDeut(id)||id==="DAC";
+ if(id==="ESC"||(isDeut(id)&&id!=="DAC"))return FULLCANON.includes(vid)||(vid==="vul"&&["TOB","JDT","WIS","SIR","BAR","1MA","2MA"].includes(id));
+ return true}
+function selVersions(){let s=store.get("vers:"+edition,null);if(!s||!s.length)s=ED().def.slice();return s.filter(v=>versionsFor().some(x=>x.id===v))}
+function effVersions(id){const s=selVersions().filter(v=>availableIn(v,id));
+ if(s.length)return{list:s,fallback:false};
+ const f=["bll","blm","rv1909"].find(v=>availableIn(v,id));return{list:[f],fallback:true}}
+const vName=id=>(VERSIONS.find(v=>v.id===id)||{}).name||id;
+
+/* --- Original: hebreo o Septuaginta --- */
+function origFor(id){if(isNT(id))return"nt";if(!hasHeb(id))return"lxx";return store.get("orig:"+edition,ED().orig)}
+
+/* --- Salmos: numeración griega/latina entre paréntesis --- */
+function psLxx(n){if(n<=8||n>=148)return null;if(n<=10)return"9";if(n<=113)return String(n-1);if(n<=115)return"113";if(n===116)return"114-115";if(n<=146)return String(n-1);return"146-147"}
+function chapTitle(id,c){let t=bookName(id)+" "+c;if(id==="PSA"&&edition!=="prot"){const g=psLxx(c);if(g)t+=` (${g})`}return t}
+
+/* --- Transliteración griega en clave española --- */
+const GTR={α:"a",β:"b",γ:"g",δ:"d",ε:"e",ζ:"ds",η:"ē",θ:"th",ι:"i",κ:"k",λ:"l",μ:"m",ν:"n",ξ:"ks",ο:"o",π:"p",ρ:"r",σ:"s",ς:"s",τ:"t",υ:"y",φ:"f",χ:"j",ψ:"ps",ω:"ō"};
+function grTranslit(w){const n=w.normalize("NFD");let out="";const rough=/̔/.test(n.slice(0,4));
+ const base=n.replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^α-ως]/g,"");
+ for(let i=0;i<base.length;i++){const c=base[i],d=base[i+1];
+  if((c==="ο"&&d==="υ")){out+="u";i++;continue}if(c==="γ"&&"γκχξ".includes(d||"")){out+="n";continue}
+  if(c==="υ"&&i>0&&"αεηο".includes(base[i-1])){out+="u";continue}out+=GTR[c]||""}
+ return (rough?"j":"")+out}
+const grNorm=w=>w.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^α-ως]/g,"").replace(/ς/g,"σ");
+
+/* --- Carga de datos --- */
+async function getBook(id){if(!BK||BK.id!==id){BK=null;await loadScript("bible/"+id+".js")}return BK}
+async function getLxx(id){if(!LXC||LXC.b!==id){LXC=null;try{await loadScript("bible/lxx/"+id+".js")}catch(e){LXC={b:id,c:[]}}}return LXC}
+async function getVer(vid,id){if(vid==="rv1909")return;const cur=VT[vid];if(cur&&cur.b===id)return;
+ try{await loadScript(`bible/v/${vid}/${id}.js`)}catch(e){VT[vid]={v:vid,b:id,c:[],missing:true}}}
+const vMap=(vid,c)=>{const d=VT[vid];if(!d||!d.c[c-1])return{};const m={};d.c[c-1].forEach(x=>m[x[0]]=x[1]);return m};
+
+/* --- Inicio --- */
 function renderCont(){const last=store.get("rd:last",null);const b=$("go-cont");
- if(last){b.hidden=false;b.textContent="Seguir leyendo: "+bookName(last[0])+" "+last[1];b.onclick=()=>openRead(last[0],last[1])}else b.hidden=true}
-$("go-ot").onclick=()=>openBooks(true);$("go-nt").onclick=()=>openBooks(false);
+ if(last&&edition&&(ED().ot.includes(last[0])||isNT(last[0]))){b.hidden=false;b.textContent="Seguir leyendo: "+chapTitle(last[0],last[1]);b.onclick=()=>openRead(last[0],last[1])}else b.hidden=true}
+function renderEdition(){const e=$("ed-chip");e.textContent=edition?"Tradición "+ED().name.toLowerCase()+" · cambiar":"Elegir tradición";
+ $("go-ot").innerHTML=`Antiguo Testamento<small>${edition==="ort"?"Septuaginta griega":"Hebreo"}${edition==="cat"?" y griego":""} · ${ED().ot.length} libros</small>`}
+function pickEdition(after){
+ openSheet(`<h3>¿Qué Biblia usás?</h3><p class="sound">Cambia los libros del Antiguo Testamento, su orden y sus nombres. Se puede cambiar cuando quieras.</p>
+  <div class="edlist">${Object.entries(EDITIONS).map(([k,e])=>`<button class="edopt ${k===edition?"on":""}" data-e="${k}"><b>${e.name}</b><small>${e.desc}</small></button>`).join("")}</div>`);
+ $("sheet-body").querySelectorAll(".edopt").forEach(b=>b.onclick=()=>{edition=b.dataset.e;store.set("edition",edition);renderEdition();renderCont();dismissSheet();if(after)setTimeout(after,WEB?260:0)})}
+$("ed-chip").onclick=()=>pickEdition();
+$("go-ot").onclick=()=>edition?openBooks(true):pickEdition(()=>openBooks(true));
+$("go-nt").onclick=()=>edition?openBooks(false):pickEdition(()=>openBooks(false));
 $("go-credits").onclick=()=>show("s-credits");
 
 function openBooks(ot){$("books-title").textContent=ot?"Antiguo Testamento":"Nuevo Testamento";
- const list=ot?BOOKS.slice(0,39):BOOKS.slice(39);
- $("books-list").innerHTML=list.map(b=>`<button class="book" data-b="${b[0]}">${esc(b[1])}<small>${b[2]} capítulo${b[2]>1?"s":""}</small></button>`).join("");
+ const list=ot?ED().ot:NT_IDS;
+ $("books-list").innerHTML=list.map(id=>{const n=chapCount(id);const tag=isDeut(id)&&id!=="DAC"&&id!=="ESC"?`<i class="dtag">${edition==="ort"?"anagignóskomena":"deuterocanónico"}</i>`:"";
+  return `<button class="book" data-b="${id}">${esc(bookName(id))}${tag}<small>${n} capítulo${n>1?"s":""}</small></button>`}).join("");
  $("books-list").querySelectorAll(".book").forEach(x=>x.onclick=()=>openChaps(x.dataset.b));show("s-books")}
-function openChaps(id){const b=BOOKS.find(x=>x[0]===id);const last=store.get("rd:last",null);
- $("chaps-title").textContent=b[1];
- $("chaps-list").innerHTML=Array.from({length:b[2]},(_,i)=>`<button class="chap ${last&&last[0]===id&&last[1]===i+1?"last":""}" data-c="${i+1}">${i+1}</button>`).join("");
+function openChaps(id){const n=chapCount(id);const last=store.get("rd:last",null);
+ $("chaps-title").textContent=bookName(id);
+ $("chaps-list").innerHTML=Array.from({length:n},(_,i)=>{const g=id==="PSA"&&edition!=="prot"?psLxx(i+1):null;
+  return `<button class="chap ${last&&last[0]===id&&last[1]===i+1?"last":""}" data-c="${i+1}">${i+1}${g?`<small>${g}</small>`:""}</button>`}).join("");
  $("chaps-list").querySelectorAll(".chap").forEach(x=>x.onclick=()=>{
   if(document.querySelector(".screen.on").id==="s-chaps"&&hist[hist.length-1]==="s-read"){hist.pop();openRead(id,+x.dataset.c,false)}else openRead(id,+x.dataset.c)});
  show("s-chaps")}
 
+/* --- Lector --- */
+const rd={b:null,c:1,tr:store.get("rd:tr",false),gl:store.get("rd:gl",true),vow:store.get("rd:vow",true)};
+async function loadFor(id){const o=origFor(id);const vs=effVersions(id).list;
+ await Promise.all([getBook(id),getLex(),(o==="lxx"||id==="DAC"||!hasHeb(id))&&!isNT(id)?getLxx(id):null,...vs.map(v=>getVer(v,id))])}
 async function openRead(id,c,push=true){
+ if(!edition){pickEdition(()=>openRead(id,c,push));return}
  const onRead=document.querySelector(".screen.on").id==="s-read";
- $("rd-title").textContent=bookName(id)+" "+c;$("rd-body").innerHTML=`<p class="loading">Abriendo ${esc(bookName(id))}…</p>`;
+ $("rd-title").textContent=chapTitle(id,c);$("rd-body").innerHTML=`<p class="loading">Abriendo ${esc(bookName(id))}…</p>`;
  if(!onRead)show("s-read",push);else if(!push){show("s-read",false)}
- try{await Promise.all([getBook(id),getLex()])}catch(e){$("rd-body").innerHTML=`<p class="loading">No se pudo abrir este libro. Cerrá la app y volvé a intentarlo.</p>`;return}
+ try{await loadFor(id)}catch(e){$("rd-body").innerHTML=`<p class="loading">No se pudo abrir este libro. Revisá tu conexión e intentá de nuevo.</p>`;return}
  rd.b=id;rd.c=Math.min(Math.max(1,c),BK.c.length);store.set("rd:last",[id,rd.c]);renderCont();renderRead();window.scrollTo(0,0)}
+async function rerender(){try{await loadFor(rd.b)}catch(e){}renderRead()}
 
-function rdTools(){const ot=BK.ot;
+function rdTools(){const id=rd.b,o=origFor(id),showHeb=o==="heb";
  const t=[["tr","Cómo se lee",rd.tr],["gl","Significado",rd.gl]];
- if(ot){t.push(["vow","Vocales",rd.vow]);t.push(["pa","Paleohebreo",paleo])}
- $("rd-tools").innerHTML=t.map(x=>`<button class="chip" aria-pressed="${x[2]}" data-t="${x[0]}">${x[1]}</button>`).join("");
- $("rd-tools").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const k=b.dataset.t;
-  if(k==="pa"){paleo=!paleo;store.set("paleo",paleo);applyPaleo()}else{rd[k]=!rd[k];store.set("rd:"+k,rd[k])}renderRead()})}
+ if(showHeb){t.push(["vow","Vocales",rd.vow]);t.push(["pa","Paleohebreo",paleo])}
+ const ev=effVersions(id).list;
+ let html=`<button class="chip vchip" id="t-ver">${ev.length===1?esc(vName(ev[0])):ev.length+" versiones"} ▾</button>`;
+ if(hasHeb(id)&&!isNT(id))html+=`<span class="seg"><button class="chip" aria-pressed="${o==="heb"}" data-o="heb">Hebreo</button><button class="chip" aria-pressed="${o==="lxx"}" data-o="lxx">Griego (LXX)</button></span>`;
+ html+=t.map(x=>`<button class="chip" aria-pressed="${x[2]}" data-t="${x[0]}">${x[1]}</button>`).join("");
+ $("rd-tools").innerHTML=html;
+ $("rd-tools").querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const k=b.dataset.t;
+  if(k==="pa"){paleo=!paleo;store.set("paleo",paleo);applyPaleo()}else{rd[k]=!rd[k];store.set("rd:"+k,rd[k])}renderRead()});
+ $("rd-tools").querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{store.set("orig:"+edition,b.dataset.o);rerender()});
+ $("t-ver").onclick=versionSheet}
+function versionSheet(){const sel=selVersions();
+ openSheet(`<h3>Versiones</h3><p class="sound">Elegí una o varias para comparar.</p><div class="edlist">${versionsFor().map(v=>{const av=availableIn(v.id,rd.b);
+  return `<button class="edopt ${sel.includes(v.id)?"on":""}" data-v="${v.id}" ${av?"":"data-na"}><b>${esc(v.name)}${sel.includes(v.id)?" ✓":""}</b><small>${esc(v.desc)}${av?"":" No incluye este libro."}</small></button>`}).join("")}</div>`);
+ $("sheet-body").querySelectorAll(".edopt").forEach(b=>b.onclick=async()=>{let s=selVersions();const v=b.dataset.v;
+  s=s.includes(v)?s.filter(x=>x!==v):[...s,v];if(!s.length)return;
+  s=VERSIONS.map(x=>x.id).filter(x=>s.includes(x));store.set("vers:"+edition,s);
+  versionSheet();await rerender()})}
+
 function glossOf(v,w,ot){if(!ot)return w[5]||"";const s=w[4]>=0?v[2][w[4]]:null;return s&&typeof s!=="string"?s[0].trim():""}
-function renderRead(){const ch=BK.c[rd.c-1];const ot=BK.ot;const lng=ot?"he":"gr";
- $("rd-title").textContent=BK.name+" "+rd.c;rdTools();
+function lxxWords(txt,vi){return txt.split(/\s+/).filter(Boolean).map((w,wi)=>`<button class="w gw" data-v="${vi}" data-g="${wi}"><span class="o">${esc(w)}</span><span class="tr">${esc(grTranslit(w))}</span></button>`).join("")}
+function renderRead(){const id=rd.b,ch=BK.c[rd.c-1],o=origFor(id),nt=o==="nt";
+ $("rd-title").textContent=chapTitle(id,rd.c);rdTools();
+ const ev=effVersions(id);const showRV=ev.list.includes("rv1909");
+ const maps={};ev.list.forEach(v=>{if(v!=="rv1909")maps[v]=vMap(v,rd.c)});
+ const lx={};if(LXC&&LXC.b===id&&LXC.c[rd.c-1])LXC.c[rd.c-1].forEach(x=>lx[x[0]]=x);
  const body=$("rd-body");body.className=(rd.tr?"":"hide-tr ")+(rd.gl?"":"hide-gl");
- const vs=ch.map((v,vi)=>{
-  const words=v[1].map((w,wi)=>{let o=w[0];if(ot){if(!rd.vow)o=stripVowels(o);if(paleo)o=toPaleo(o)}
-   const g=glossOf(v,w,ot);
-   return `<button class="w ${!ot&&w[6]?"var":""}" data-v="${vi}" data-w="${wi}"><span class="o">${esc(o)}</span><span class="tr">${esc(w[1])}</span><span class="gl">${g?esc(g):"—"}</span></button>`}).join("");
-  const es=v[2].map((s,si)=>typeof s==="string"?esc(s):`<span data-v="${vi}" data-s="${si}">${esc(s[0])}</span>`).join("");
-  return `<div class="vs" id="v${v[0]}"><div class="vn">${v[0]}</div>${words?`<div class="orig ${lng} ${ot?"rtl":""}">${words}</div>`:""}<p class="esv">${es||"<i>(Este versículo no aparece separado en la Reina-Valera 1909.)</i>"}</p></div>`}).join("");
+ const multi=ev.list.length>1;
+ let anyLxx=false;
+ const vs=ch.map((v,vi)=>{const vn=v[0];
+  let orig="";
+  if(o==="lxx"||(o==="heb"&&!v[1].length&&lx[vn])){const g=lx[vn];
+   if(g){anyLxx=true;orig=`<div class="orig gr lxx">${g[2]?`<span class="gref">LXX ${esc(g[2])}</span>`:""}${lxxWords(g[1],vi)}</div>`}
+   else if(o==="lxx")orig=`<div class="nogr">Este versículo no está en la Septuaginta o está en otro lugar.</div>`}
+  else if(v[1].length){const ot=!nt;const lng=ot?"he":"gr";
+   const words=v[1].map((w,wi)=>{let s=w[0];if(ot){if(!rd.vow)s=stripVowels(s);if(paleo)s=toPaleo(s)}const g=glossOf(v,w,ot);
+    return `<button class="w ${!ot&&w[6]?"var":""}" data-v="${vi}" data-w="${wi}"><span class="o">${esc(s)}</span><span class="tr">${esc(w[1])}</span><span class="gl">${g?esc(g):"—"}</span></button>`}).join("");
+   orig=`<div class="orig ${lng} ${ot?"rtl":""}">${words}</div>`}
+  const es=ev.list.map(vid=>{let txt;
+   if(vid==="rv1909"){txt=v[2].map((s,si)=>typeof s==="string"?esc(s):`<span data-v="${vi}" data-s="${si}">${esc(s[0])}</span>`).join("");}
+   else{const t=maps[vid][vn];txt=t?esc(t):""}
+   if(!txt)txt=`<i class="muted">${id==="DAC"&&!v[1].length?"(esta versión no incluye las partes griegas de Daniel)":vid==="rv1909"?"(no aparece separado en esta versión)":"(unido a otro versículo en esta versión)"}</i>`;
+   return `<p class="esv ${vid==="vul"?"lat":""}">${multi?`<span class="vtag">${esc(vid==="rv1909"?"RV1909":vName(vid).split(" (")[0])}</span>`:""}${txt}</p>`}).join("");
+  return `<div class="vs" id="v${vn}"><div class="vn">${vn}</div>${orig}${es}</div>`}).join("");
  const prev=rd.c>1,next=rd.c<BK.c.length;
- body.innerHTML=vs+`<div class="rd-nav">${prev?`<button class="btn ghost" id="rd-prev">‹ Capítulo ${rd.c-1}</button>`:""}${next?`<button class="btn" id="rd-next">Capítulo ${rd.c+1} ›</button>`:""}</div>`;
+ let note="";
+ if(ev.fallback)note+=`<p class="rdnote">Tus versiones elegidas no incluyen este libro: se muestra la ${esc(vName(ev.list[0]))}.</p>`;
+ if(o==="lxx"&&!anyLxx&&!nt)note+=`<p class="rdnote">La Septuaginta ordena este pasaje de otra manera${id==="PRO"?" (Proverbios 30 y 31 están repartidos en los capítulos 24 y 29 del griego)":""}. Podés leerlo en hebreo con el botón «Hebreo».</p>`;
+ body.innerHTML=note+vs+`<div class="rd-nav">${prev?`<button class="btn ghost" id="rd-prev">‹ Capítulo ${rd.c-1}</button>`:""}${next?`<button class="btn" id="rd-next">Capítulo ${rd.c+1} ›</button>`:""}</div>`;
  if(prev)$("rd-prev").onclick=()=>{rd.c--;store.set("rd:last",[rd.b,rd.c]);renderCont();renderRead();window.scrollTo(0,0)};
  if(next)$("rd-next").onclick=()=>{rd.c++;store.set("rd:last",[rd.b,rd.c]);renderCont();renderRead();window.scrollTo(0,0)}}
 function clearHl(){document.querySelectorAll("#rd-body .hl").forEach(x=>x.classList.remove("hl"))}
-$("rd-body").addEventListener("click",e=>{const w=e.target.closest(".w");const s=e.target.closest("span[data-s]");
+$("rd-body").addEventListener("click",e=>{const g=e.target.closest(".gw");if(g){rdGreek(+g.dataset.v,+g.dataset.g,g);return}
+ const w=e.target.closest(".w");const s=e.target.closest("span[data-s]");
  if(w){rdWord(+w.dataset.v,+w.dataset.w,w);return}
  if(s){clearHl();const vi=+s.dataset.v,si=+s.dataset.s;s.classList.add("hl");
-  BK.c[rd.c-1][vi][1].forEach((w,wi)=>{if(w[4]===si)document.querySelector(`#rd-body .w[data-v="${vi}"][data-w="${wi}"]`).classList.add("hl")})}});
+  BK.c[rd.c-1][vi][1].forEach((w,wi)=>{if(w[4]===si)document.querySelector(`#rd-body .w[data-v="${vi}"][data-w="${wi}"]`)?.classList.add("hl")})}});
 $("rd-pick").onclick=()=>openChaps(rd.b);
 
-function rdWord(vi,wi,btn){const v=BK.c[rd.c-1][vi];const w=v[1][wi];const ot=BK.ot;const lng=ot?"he":"gr";
+async function rdGreek(vi,gi,btn){clearHl();btn.classList.add("hl");const w=btn.querySelector(".o").textContent;
+ if(typeof window.FORMS==="undefined"){try{await loadScript("bible/forms.js")}catch(e){}}
+ const st=(window.FORMS||{})[grNorm(w)];const L=st&&LX["G"+st];
+ const clean=w.replace(/[.,;:·!?»«“”()\[\]]/g,"");
+ openSheet(`<div class="big gr" style="font-size:48px">${esc(clean)}</div><p class="sound">Se lee: <b>${esc(grTranslit(w))}</b></p>
+  <div class="kv"><span>Texto</span><div>Septuaginta, la traducción griega del Antiguo Testamento que usaban los apóstoles y que lee la Iglesia ortodoxa.</div></div>
+  ${L?`<div class="kv lexline"><span>Esta misma forma en el Nuevo Testamento</span><div><span class="lem gr-t">${esc(L[0])}</span> · aparece ${L[1].toLocaleString("es")} veces en la Biblia</div>
+   ${L[2].length?`<div style="margin-top:6px;color:var(--muted);font-size:14px">La Reina-Valera la traduce como:</div><div class="uses">${L[2].map(u=>`<b>${esc(u)}</b>`).join("")}</div>`:""}</div>
+   <div class="strong">Strong G${st}</div>`
+  :`<div class="note">Todavía no tenemos el análisis de esta palabra. El texto griego de la Septuaginta llega sin etiquetas de gramática; las agregaremos más adelante.</div>`}`)}
+
+function rdWord(vi,wi,btn){const v=BK.c[rd.c-1][vi];const w=v[1][wi];const ot=!isNT(rd.b);const lng=ot?"he":"gr";
  const L=LX[(ot?"H":"G")+w[2]];
  clearHl();btn.classList.add("hl");const seg=w[4]>=0?v[2][w[4]]:null;
  if(seg)document.querySelector(`#rd-body span[data-v="${vi}"][data-s="${w[4]}"]`)?.classList.add("hl");
@@ -615,17 +767,21 @@ function rdWord(vi,wi,btn){const v=BK.c[rd.c-1][vi];const w=v[1][wi];const ot=BK
   ${flag?`<div class="note">${flag}</div>`:""}
   ${w[2]?`<div class="strong">Strong ${ot?"H":"G"}${w[2]}</div>`:""}`)}
 
-applyPaleo();renderHome();renderCont();
+applyPaleo();renderHome();renderEdition();renderCont();
+$("credits-versions").innerHTML=VERSIONS.map(v=>`<li><b>${esc(v.name)}:</b> ${esc(v.credit)}</li>`).join("");
 if(WEB&&"serviceWorker" in navigator){
  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
  const sa=$("save-all");sa.hidden=false;
  const setSaved=()=>{sa.classList.add("ok");sa.textContent="✓ La Biblia completa está guardada en este dispositivo y funciona sin internet."};
- if(store.get("saved",false))setSaved();else sa.textContent="Guardar la Biblia completa para leerla sin internet (unos 10 MB)";
+ if(store.get("saved:"+edition,false))setSaved();else sa.textContent="Guardar la Biblia para leerla sin internet (texto original y tus versiones elegidas)";
  sa.onclick=async()=>{if(sa.classList.contains("ok"))return;
-  try{const reg=await navigator.serviceWorker.ready;sa.textContent="Preparando la descarga…";reg.active.postMessage("save-all")}
+  try{const reg=await navigator.serviceWorker.ready;sa.textContent="Preparando la descarga…";const ids=[...(edition?ED().ot:BOOKS.slice(0,39).map(b=>b[0])),...NT_IDS];
+   const extra=["bible/extra.js","bible/forms.js"];
+   ids.forEach(id=>{if(!isNT(id))extra.push("bible/lxx/"+id+".js");selVersions().forEach(v=>{if(v!=="rv1909"&&availableIn(v,id))extra.push(`bible/v/${v}/${id}.js`)})});
+   reg.active.postMessage({type:"save-all",books:ids.map(id=>"bible/"+id+".js"),extra})}
   catch(e){sa.textContent="No se pudo guardar. Revisá tu conexión e intentá de nuevo."}};
  navigator.serviceWorker.addEventListener("message",e=>{const d=e.data||{};
-  if(d.type==="save-progress"){if(d.done>=d.total){store.set("saved",true);setSaved()}else sa.textContent=`Guardando la Biblia… ${d.done} de ${d.total} libros`}
+  if(d.type==="save-progress"){if(d.done>=d.total){store.set("saved:"+edition,true);setSaved()}else sa.textContent=`Guardando la Biblia… ${Math.round(d.done*100/d.total)} %`}
   if(d.type==="save-error")sa.textContent="Se cortó la conexión. Tocá aquí para seguir guardando."});
 }
 </script>

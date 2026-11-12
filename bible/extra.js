@@ -1,0 +1,1 @@
+EXTRA={"TOB":["Tobías",14],"JDT":["Judit",16],"WIS":["Sabiduría",19],"SIR":["Eclesiástico (Sirácida)",51],"BAR":["Baruc",6],"1MA":["1 Macabeos",16],"2MA":["2 Macabeos",15],"1ES":["1 Esdras",9],"3MA":["3 Macabeos",7],"4MA":["4 Macabeos",18],"MAN":["Oración de Manasés",1],"PS2":["Salmo 151",1],"DAC":["Daniel",14],"ESC":["Ester",10]};
