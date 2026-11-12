@@ -213,6 +213,16 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .chap.hasctx::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:3px auto 0}
 .vs.flash{animation:flash 1.6s ease}
 @keyframes flash{0%,40%{background:var(--gold-soft)}100%{background:transparent}}
+button.vn{display:inline-flex;align-items:center;gap:5px;color:var(--gold);font-weight:700;font-size:12px;padding:2px 8px 2px 0;border-radius:6px}
+button.vn::after{content:"Explicación";font-weight:600;font-size:11px;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:1px 8px}
+.notes-on button.vn::after{display:none}
+.vnote{display:none;margin-top:8px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:15px;line-height:1.55}
+.notes-on .vnote{display:block}
+.vnote .vt{display:block;margin-top:8px;font-size:14px;color:var(--muted)}
+.vnote .vt b{color:var(--accent);font-weight:700}
+.vnote .more{color:var(--accent);font-weight:600;font-size:13px;margin-top:6px;display:inline-block}
+.vsheet-txt{font-family:var(--f-gr);font-size:18px;line-height:1.55;margin:4px 0 10px}
+.vsheet-note{font-family:var(--f-gr);font-size:17px;line-height:1.6}
 .save-all{display:block;width:100%;margin-top:8px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:14px;text-align:left}
 .save-all.ok{border-style:solid;color:var(--accent)}
 .bible-card{background:var(--accent);color:var(--surface);border-radius:16px;padding:18px 16px;margin-top:8px;display:grid;gap:12px}
@@ -356,7 +366,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
   <p><b>Traducciones:</b></p>
   <ul id="credits-versions"></ul>
   <p>En todas las versiones se omiten las notas al pie, las referencias cruzadas y los títulos de sección. El texto bíblico no se modifica.</p>
-<p class="appver">Raíces versión 0.6 <button class="chip" id="reset-app" hidden>Borrar copia guardada y recargar</button></p>
+<p class="appver">Raíces versión 0.7 <button class="chip" id="reset-app" hidden>Borrar copia guardada y recargar</button></p>
   <p><b>Fuentes tipográficas:</b> Gentium Book Plus, Noto Serif Hebrew, Noto Sans Phoenician y Noto Sans (licencia SIL Open Font License).</p>
 </div></section>
 
@@ -366,6 +376,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 <script src="bible/index.js"></script>
 <script src="bible/extra.js"></script>
 <script src="bible/ch/index.js"></script>
+<script src="bible/vv/index.js"></script>
 <script>
 /* ===== DATOS ===== */
 const GREEK=[
@@ -712,7 +723,7 @@ function openChaps(id){const n=chapCount(id);const last=store.get("rd:last",null
 /* --- Lector --- */
 const rd={b:null,c:1,tr:store.get("rd:tr",false),gl:store.get("rd:gl",true),vow:store.get("rd:vow",true)};
 async function loadFor(id){const o=origFor(id);const vs=effVersions(id).list;
- await Promise.all([getBook(id),getLex(),(o==="lxx"||id==="DAC"||!hasHeb(id))&&!isNT(id)?getLxx(id):null,...vs.map(v=>getVer(v,id))])}
+ await Promise.all([getBook(id),getLex(),getVV(id),(o==="lxx"||id==="DAC"||!hasHeb(id))&&!isNT(id)?getLxx(id):null,...vs.map(v=>getVer(v,id))])}
 async function openRead(id,c,push=true){
  if(!edition){pickEdition(()=>openRead(id,c,push));return}
  const onRead=document.querySelector(".screen.on").id==="s-read";
@@ -726,14 +737,16 @@ function rdTools(){const id=rd.b,o=origFor(id),showHeb=o==="heb";
  const t=[["tr","Cómo se lee",rd.tr],["gl","Significado",rd.gl]];
  if(showHeb){t.push(["vow","Vocales",rd.vow]);t.push(["pa","Paleohebreo",paleo])}
  const ev=effVersions(id).list;
- let html=`<button class="chip vchip" id="t-ver">${ev.length===1?esc(vName(ev[0])):ev.length+" versiones"} ▾</button>`;
+ let html=hasVV(id,rd.c)?`<button class="chip" aria-pressed="${rd.notes}" id="t-notes">Explicación</button>`:"";
+ html+=`<button class="chip vchip" id="t-ver">${ev.length===1?esc(vName(ev[0])):ev.length+" versiones"} ▾</button>`;
  if(hasHeb(id)&&!isNT(id))html+=`<span class="seg"><button class="chip" aria-pressed="${o==="heb"}" data-o="heb">Hebreo</button><button class="chip" aria-pressed="${o==="lxx"}" data-o="lxx">Griego (LXX)</button></span>`;
  html+=t.map(x=>`<button class="chip" aria-pressed="${x[2]}" data-t="${x[0]}">${x[1]}</button>`).join("");
  $("rd-tools").innerHTML=html;
  $("rd-tools").querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const k=b.dataset.t;
   if(k==="pa"){paleo=!paleo;store.set("paleo",paleo);applyPaleo()}else{rd[k]=!rd[k];store.set("rd:"+k,rd[k])}renderRead()});
  $("rd-tools").querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{store.set("orig:"+edition,b.dataset.o);rerender()});
- $("t-ver").onclick=versionSheet}
+ $("t-ver").onclick=versionSheet;
+ if($("t-notes"))$("t-notes").onclick=()=>{rd.notes=!rd.notes;store.set("rd:notes",rd.notes);renderRead()}}
 function versionSheet(){const sel=selVersions();
  openSheet(`<h3>Versiones</h3><p class="sound">Elegí una o varias para comparar.</p><div class="edlist">${versionsFor().map(v=>{const av=availableIn(v.id,rd.b);
   return `<button class="edopt ${sel.includes(v.id)?"on":""}" data-v="${v.id}" ${av?"":"data-na"}><b>${esc(v.name)}${sel.includes(v.id)?" ✓":""}</b><small>${esc(v.desc)}${av?"":" No incluye este libro."}</small></button>`}).join("")}</div>`);
@@ -749,7 +762,8 @@ function renderRead(){const id=rd.b,ch=BK.c[rd.c-1],o=origFor(id),nt=o==="nt";
  const ev=effVersions(id);const showRV=ev.list.includes("rv1909");
  const maps={};ev.list.forEach(v=>{if(v!=="rv1909")maps[v]=vMap(v,rd.c)});
  const lx={};if(LXC&&LXC.b===id&&LXC.c[rd.c-1])LXC.c[rd.c-1].forEach(x=>lx[x[0]]=x);
- const body=$("rd-body");body.className=(rd.tr?"":"hide-tr ")+(rd.gl?"":"hide-gl");
+ const body=$("rd-body");const vvc=hasVV(id,rd.c)?(VVN_DATA[vvKey(id)]||{})[String(rd.c)]:null;
+ body.className=(rd.tr?"":"hide-tr ")+(rd.gl?"":"hide-gl ")+(vvc&&rd.notes?"notes-on":"");
  const multi=ev.list.length>1;
  let anyLxx=false;
  const vs=ch.map((v,vi)=>{const vn=v[0];
@@ -766,10 +780,13 @@ function renderRead(){const id=rd.b,ch=BK.c[rd.c-1],o=origFor(id),nt=o==="nt";
    else{const t=maps[vid][vn];txt=t?esc(t):""}
    if(!txt)txt=`<i class="muted">${id==="DAC"&&!v[1].length?"(esta versión no incluye las partes griegas de Daniel)":vid==="rv1909"?"(no aparece separado en esta versión)":"(unido a otro versículo en esta versión)"}</i>`;
    return `<p class="esv ${vid==="vul"?"lat":""}">${multi?`<span class="vtag">${esc(vid==="rv1909"?"RV1909":vName(vid).split(" (")[0])}</span>`:""}${txt}</p>`}).join("");
-  return `<div class="vs" id="v${vn}"><div class="vn">${vn}</div>${orig}${es}</div>`}).join("");
+  const vnt=vvc&&vvc[String(vn)];const ed=edition||"prot";
+  const vnum=vnt?`<button class="vn" data-vn="${vn}" aria-label="Explicación del versículo ${vn}">${vn}</button>`:`<div class="vn">${vn}</div>`;
+  const inline=vnt?`<div class="vnote">${esc(vnt.n)}${vnt.t&&vnt.t[ed]?`<span class="vt"><b>${TNAME[ed]}:</b> ${esc(vnt.t[ed])}</span><button class="more" data-vn="${vn}">Ver las otras tradiciones</button>`:""}</div>`:"";
+  return `<div class="vs" id="v${vn}">${vnum}${orig}${es}${inline}</div>`}).join("");
  const prev=rd.c>1,next=rd.c<BK.c.length;
  let note="";
- if(hasChCtx(id))note+=`<button class="ch-banner" id="ch-banner"><span><b>Contexto de ${esc(chapTitle(id,rd.c))}</b><small>Cultura, por qué se enseña y cómo no sacarlo de contexto</small></span><span class="chev">›</span></button>`;
+ if(hasChCtx(id))note+=`<button class="ch-banner" id="ch-banner"><span><b>Contexto de ${esc(chapTitle(id,rd.c))}</b><small>${hasVV(id,rd.c)?"Cultura, por qué se enseña y explicación de cada versículo":"Cultura, por qué se enseña y cómo no sacarlo de contexto"}</small></span><span class="chev">›</span></button>`;
  if(ev.fallback)note+=`<p class="rdnote">Tus versiones elegidas no incluyen este libro: se muestra la ${esc(vName(ev.list[0]))}.</p>`;
  if(o==="lxx"&&!anyLxx&&!nt)note+=`<p class="rdnote">La Septuaginta ordena este pasaje de otra manera${id==="PRO"?" (Proverbios 30 y 31 están repartidos en los capítulos 24 y 29 del griego)":""}. Podés leerlo en hebreo con el botón «Hebreo».</p>`;
  body.innerHTML=note+vs+`<div class="rd-nav">${prev?`<button class="btn ghost" id="rd-prev">‹ Capítulo ${rd.c-1}</button>`:""}${next?`<button class="btn" id="rd-next">Capítulo ${rd.c+1} ›</button>`:""}</div>`;
@@ -777,7 +794,8 @@ function renderRead(){const id=rd.b,ch=BK.c[rd.c-1],o=origFor(id),nt=o==="nt";
  if(prev)$("rd-prev").onclick=()=>{rd.c--;store.set("rd:last",[rd.b,rd.c]);renderCont();renderRead();window.scrollTo(0,0)};
  if(next)$("rd-next").onclick=()=>{rd.c++;store.set("rd:last",[rd.b,rd.c]);renderCont();renderRead();window.scrollTo(0,0)}}
 function clearHl(){document.querySelectorAll("#rd-body .hl").forEach(x=>x.classList.remove("hl"))}
-$("rd-body").addEventListener("click",e=>{const g=e.target.closest(".gw");if(g){rdGreek(+g.dataset.v,+g.dataset.g,g);return}
+$("rd-body").addEventListener("click",e=>{const vb=e.target.closest("[data-vn]");if(vb){verseNote(+vb.dataset.vn);return}
+ const g=e.target.closest(".gw");if(g){rdGreek(+g.dataset.v,+g.dataset.g,g);return}
  const w=e.target.closest(".w");const s=e.target.closest("span[data-s]");
  if(w){rdWord(+w.dataset.v,+w.dataset.w,w);return}
  if(s){clearHl();const vi=+s.dataset.v,si=+s.dataset.s;s.classList.add("hl");
@@ -795,9 +813,22 @@ async function rdGreek(vi,gi,btn){clearHl();btn.classList.add("hl");const w=btn.
    <div class="strong">Strong G${st}</div>`
   :`<div class="note">Todavía no tenemos el análisis de esta palabra. El texto griego de la Septuaginta llega sin etiquetas de gramática; las agregaremos más adelante.</div>`}`)}
 
+/* --- Explicación de un versículo --- */
+function verseNote(vn){const id=rd.b,c=rd.c;const nt=((VVN_DATA[vvKey(id)]||{})[String(c)]||{})[String(vn)];if(!nt)return;
+ const v=BK.c[c-1].find(x=>x[0]===vn);const ev=effVersions(id).list[0];
+ let txt="";if(ev==="rv1909"&&v)txt=v[2].map(x=>typeof x==="string"?x:x[0]).join("");else{const m=vMap(ev,c);txt=m[vn]||""}
+ openSheet(`<div class="ref">${esc(chapTitle(id,c))}:${vn}</div>${txt?`<p class="vsheet-txt">${esc(txt)}</p>`:""}
+  <div class="kv"><span>Explicación</span><div class="vsheet-note">${esc(nt.n)}</div></div>
+  ${nt.t?theoHtml(nt.t):""}`)}
+
 /* --- Contexto: ficha del capítulo y del libro --- */
 const TNAME={cat:"Lectura católica",ort:"Lectura ortodoxa",prot:"Lectura protestante"};
 const CHX_DATA={};window.CHX=d=>{CHX_DATA[d.b]=d.c};
+const VVN_DATA={};window.VVN=d=>{VVN_DATA[d.b]=d.c};
+const vvKey=id=>id==="DAC"?"DAN":id==="ESC"?"EST":id;
+const hasVV=(id,c)=>{const l=(window.VVBOOKS||{})[vvKey(id)];return !!(l&&l.includes(c))};
+async function getVV(id){const k=vvKey(id);if(!(window.VVBOOKS||{})[k])return null;if(!VVN_DATA[k]){try{await loadScript("bible/vv/"+k+".js")}catch(e){return null}}return VVN_DATA[k]}
+rd.notes=store.get("rd:notes",false);
 const hasChCtx=id=>(window.CHBOOKS||[]).includes(id==="DAC"?"DAN":id==="ESC"?"EST":id);
 async function getChCtx(id){const k=id==="DAC"?"DAN":id==="ESC"?"EST":id;if(!hasChCtx(id))return null;
  if(!CHX_DATA[k]){try{await loadScript("bible/ch/"+k+".js")}catch(e){return null}}return CHX_DATA[k]}
@@ -880,7 +911,7 @@ if(WEB&&"serviceWorker" in navigator){
  if(store.get("saved:"+edition+":w4",false))setSaved();else sa.textContent="Guardar la Biblia para leerla sin internet (texto original y tus versiones elegidas)";
  sa.onclick=async()=>{if(sa.classList.contains("ok"))return;
   try{const reg=await navigator.serviceWorker.ready;sa.textContent="Preparando la descarga…";const ids=[...(edition?ED().ot:BOOKS.slice(0,39).map(b=>b[0])),...NT_IDS];
-   const extra=["bible/extra.js","bible/forms.js","bible/context.js","bible/ch/index.js",...(window.CHBOOKS||[]).map(b=>"bible/ch/"+b+".js")];
+   const extra=["bible/extra.js","bible/forms.js","bible/context.js","bible/ch/index.js",...(window.CHBOOKS||[]).map(b=>"bible/ch/"+b+".js"),"bible/vv/index.js",...Object.keys(window.VVBOOKS||{}).map(b=>"bible/vv/"+b+".js")];
    ids.forEach(id=>{if(!isNT(id))extra.push("bible/lxx/"+id+".js");selVersions().forEach(v=>{if(v!=="rv1909"&&availableIn(v,id))extra.push(`bible/v/${v}/${id}.js`)})});
    reg.active.postMessage({type:"save-all",books:ids.map(id=>"bible/"+id+".js"),extra})}
   catch(e){sa.textContent="No se pudo guardar. Revisá tu conexión e intentá de nuevo."}};
