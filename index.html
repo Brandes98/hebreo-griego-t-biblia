@@ -177,6 +177,30 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .esv.lat{font-style:italic}
 .muted{color:var(--muted);font-size:14px}
 .rdnote{background:var(--gold-soft);border-radius:12px;padding:10px 12px;font-size:14px;margin:4px 0 8px}
+.ctx-btn{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:7px 12px}
+.ctx-card{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;width:100%;text-align:left;background:var(--gold-soft);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.ctx-card b{flex:1 1 70%;font-size:16px}.ctx-card small{order:3;flex-basis:100%;color:var(--muted);font-size:13px}
+.ctx-hero{padding:4px 0 12px}
+.ctx-hero h1{font-family:var(--f-gr);font-size:32px;line-height:1.15}
+.ctx-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 4px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.fact span{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.fact p{margin:0;font-size:14px;line-height:1.45}
+.fact.wide{grid-column:1/-1}
+.ctx-sec{margin-top:18px}
+.ctx-sec h3{font-size:13px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.ctx-sec p{margin:0;font-family:var(--f-gr);font-size:17px;line-height:1.6;max-width:62ch}
+.ctx-sec ol{margin:0;padding-left:20px;display:grid;gap:4px}
+.ctx-sec li{font-size:15px}
+.ctx-theo{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:14px 16px}
+.ctx-theo h3{color:var(--accent);margin:0 0 6px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.ctx-theo p{margin:0;font-family:var(--f-gr);font-size:17px;line-height:1.6}
+.ctx-theo .hint{font-size:12px;color:var(--muted);margin:8px 0 0}
+.ctx-others{margin-top:10px}
+.ctx-others summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:14px;padding:8px 0}
+.ctx-others .ctx-theo{border-left-color:var(--line);margin-top:8px}
+.ctx-others .ctx-theo h3{color:var(--muted)}
+.ctx-warn{font-size:12px;color:var(--muted);margin-top:22px}
 .save-all{display:block;width:100%;margin-top:8px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:14px;text-align:left}
 .save-all.ok{border-style:solid;color:var(--accent)}
 .bible-card{background:var(--accent);color:var(--surface);border-radius:16px;padding:18px 16px;margin-top:8px;display:grid;gap:12px}
@@ -293,14 +317,21 @@ h1,h2,h3{text-wrap:balance;margin:0}
 <!-- CAPÍTULOS -->
 <section class="screen" id="s-chaps"><div class="wrap">
   <div class="top"><button class="back" data-back aria-label="Volver">‹</button><h2 id="chaps-title"></h2></div>
+  <button class="ctx-card" id="chaps-ctx"><b>Contexto histórico del libro</b><small id="chaps-ctx-sub">Quién lo escribió, cuándo, para quién y por qué</small><span class="chev">›</span></button>
   <div class="chaps" id="chaps-list"></div>
 </div></section>
 
 <!-- LECTOR -->
 <section class="screen" id="s-read"><div class="wrap">
-  <div class="top rd-top"><button class="back" data-back aria-label="Volver">‹</button><h2 id="rd-title"></h2><button class="back" id="rd-pick" aria-label="Elegir capítulo">☰</button></div>
+  <div class="top rd-top"><button class="back" data-back aria-label="Volver">‹</button><h2 id="rd-title"></h2><button class="ctx-btn" id="rd-ctx" aria-label="Contexto del libro">Contexto</button><button class="back" id="rd-pick" aria-label="Elegir capítulo">☰</button></div>
   <div class="rd-tools" id="rd-tools"></div>
   <div id="rd-body"></div>
+</div></section>
+
+<!-- CONTEXTO -->
+<section class="screen" id="s-ctx"><div class="wrap">
+  <div class="top"><button class="back" data-back aria-label="Volver">‹</button><h2 id="ctx-title">Contexto</h2></div>
+  <div id="ctx-body"></div>
 </div></section>
 
 <!-- CRÉDITOS -->
@@ -655,6 +686,7 @@ function openBooks(ot){$("books-title").textContent=ot?"Antiguo Testamento":"Nue
   return `<button class="book" data-b="${id}">${esc(bookName(id))}${tag}<small>${n} capítulo${n>1?"s":""}</small></button>`}).join("");
  $("books-list").querySelectorAll(".book").forEach(x=>x.onclick=()=>openChaps(x.dataset.b));show("s-books")}
 function openChaps(id){const n=chapCount(id);const last=store.get("rd:last",null);
+ $("chaps-ctx").onclick=()=>openCtx(id);
  $("chaps-title").textContent=bookName(id);
  $("chaps-list").innerHTML=Array.from({length:n},(_,i)=>{const g=id==="PSA"&&edition!=="prot"?psLxx(i+1):null;
   return `<button class="chap ${last&&last[0]===id&&last[1]===i+1?"last":""}" data-c="${i+1}">${i+1}${g?`<small>${g}</small>`:""}</button>`}).join("");
@@ -746,6 +778,25 @@ async function rdGreek(vi,gi,btn){clearHl();btn.classList.add("hl");const w=btn.
    <div class="strong">Strong G${st}</div>`
   :`<div class="note">Todavía no tenemos el análisis de esta palabra. El texto griego de la Septuaginta llega sin etiquetas de gramática; las agregaremos más adelante.</div>`}`)}
 
+/* --- Contexto histórico del libro --- */
+const TNAME={cat:"Lectura católica",ort:"Lectura ortodoxa",prot:"Lectura protestante"};
+async function openCtx(id){
+ if(typeof window.CTX==="undefined"){try{await loadScript("bible/context.js")}catch(e){}}
+ const c=(window.CTX||{})[id];$("ctx-title").textContent="Contexto";
+ if(!c){$("ctx-body").innerHTML=`<p class="loading">Todavía no hay ficha para este libro.</p>`;show("s-ctx");return}
+ const ed=edition||"prot";const others=Object.keys(TNAME).filter(k=>k!==ed&&c.t[k]);
+ $("ctx-body").innerHTML=`<div class="ctx-hero"><div class="ref">${isNT(id)?"Nuevo Testamento":"Antiguo Testamento"}</div><h1>${esc(bookName(id))}</h1></div>
+  <div class="ctx-facts"><div class="fact wide"><span>Autor</span><p>${esc(c.a)}</p></div><div class="fact"><span>Fecha</span><p>${esc(c.f)}</p></div><div class="fact"><span>Para quién</span><p>${esc(c.d)}</p></div></div>
+  <div class="ctx-sec"><h3>Qué estaba pasando</h3><p>${esc(c.h)}</p></div>
+  <div class="ctx-sec"><h3>Por qué se escribió</h3><p>${esc(c.p)}</p></div>
+  <div class="ctx-sec"><h3>Cómo está organizado</h3><ol>${c.e.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>
+  <div class="ctx-sec"><h3>Dato curioso</h3><p>${esc(c.c)}</p></div>
+  ${c.t[ed]?`<div class="ctx-theo"><h3>${TNAME[ed]}</h3><p>${esc(c.t[ed])}</p><p class="hint">Según la tradición que elegiste en la app.</p></div>`:""}
+  ${others.length?`<details class="ctx-others"><summary>Ver cómo lo leen otras tradiciones</summary>${others.map(k=>`<div class="ctx-theo"><h3>${TNAME[k]}</h3><p>${esc(c.t[k])}</p></div>`).join("")}</details>`:""}
+  <p class="ctx-warn">Las fechas y los autores de muchos libros se discuten. Esta ficha resume lo que dice la tradición y lo que piensan muchos historiadores, sin decidir quién tiene la razón.</p>`;
+ show("s-ctx")}
+$("rd-ctx").onclick=()=>openCtx(rd.b);
+
 function rdWord(vi,wi,btn){const v=BK.c[rd.c-1][vi];const w=v[1][wi];const ot=!isNT(rd.b);const lng=ot?"he":"gr";
  const L=LX[(ot?"H":"G")+w[2]];
  clearHl();btn.classList.add("hl");const seg=w[4]>=0?v[2][w[4]]:null;
@@ -776,7 +827,7 @@ if(WEB&&"serviceWorker" in navigator){
  if(store.get("saved:"+edition,false))setSaved();else sa.textContent="Guardar la Biblia para leerla sin internet (texto original y tus versiones elegidas)";
  sa.onclick=async()=>{if(sa.classList.contains("ok"))return;
   try{const reg=await navigator.serviceWorker.ready;sa.textContent="Preparando la descarga…";const ids=[...(edition?ED().ot:BOOKS.slice(0,39).map(b=>b[0])),...NT_IDS];
-   const extra=["bible/extra.js","bible/forms.js"];
+   const extra=["bible/extra.js","bible/forms.js","bible/context.js"];
    ids.forEach(id=>{if(!isNT(id))extra.push("bible/lxx/"+id+".js");selVersions().forEach(v=>{if(v!=="rv1909"&&availableIn(v,id))extra.push(`bible/v/${v}/${id}.js`)})});
    reg.active.postMessage({type:"save-all",books:ids.map(id=>"bible/"+id+".js"),extra})}
   catch(e){sa.textContent="No se pudo guardar. Revisá tu conexión e intentá de nuevo."}};
