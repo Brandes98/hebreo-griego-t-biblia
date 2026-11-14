@@ -366,7 +366,7 @@ button.vn::after{content:"Explicación";font-weight:600;font-size:11px;color:var
   <p><b>Traducciones:</b></p>
   <ul id="credits-versions"></ul>
   <p>En todas las versiones se omiten las notas al pie, las referencias cruzadas y los títulos de sección. El texto bíblico no se modifica.</p>
-<p class="appver">Raíces versión 0.17 <button class="chip" id="reset-app" hidden>Borrar copia guardada y recargar</button></p>
+<p class="appver">Raíces versión 0.18 <button class="chip" id="reset-app" hidden>Borrar copia guardada y recargar</button></p>
   <p><b>Fuentes tipográficas:</b> Gentium Book Plus, Noto Serif Hebrew, Noto Sans Phoenician y Noto Sans (licencia SIL Open Font License).</p>
 </div></section>
 
@@ -757,16 +757,17 @@ function versionSheet(){const sel=selVersions();
 
 function glossOf(v,w,ot){if(!ot)return w[5]||"";const s=w[4]>=0?v[2][w[4]]:null;return s&&typeof s!=="string"?s[0].trim():""}
 function lxxWords(txt,vi){return txt.split(/\s+/).filter(Boolean).map((w,wi)=>`<button class="w gw" data-v="${vi}" data-g="${wi}"><span class="o">${esc(w)}</span><span class="tr">${esc(grTranslit(w))}</span></button>`).join("")}
-function renderRead(){const id=rd.b,ch=BK.c[rd.c-1],o=origFor(id),nt=o==="nt";
+function renderRead(){const id=rd.b,o=origFor(id),nt=o==="nt";let ch=BK.c[rd.c-1];
  $("rd-title").textContent=chapTitle(id,rd.c);rdTools();
  const ev=effVersions(id);const showRV=ev.list.includes("rv1909");
  const maps={};ev.list.forEach(v=>{if(v!=="rv1909")maps[v]=vMap(v,rd.c)});
+ {/* versículos que solo trae alguna versión (p. ej. Romanos 14:24-26 en la Biblia Libre) */const have=new Set(ch.map(v=>v[0])),add=new Set();Object.values(maps).forEach(m=>{for(const k in m)if(m[k]&&!have.has(+k))add.add(+k)});if(add.size)ch=ch.concat([...add].map(n=>[n,[],[]])).sort((a,b)=>a[0]-b[0])}
  const lx={};if(LXC&&LXC.b===id&&LXC.c[rd.c-1])LXC.c[rd.c-1].forEach(x=>lx[x[0]]=x);
  const body=$("rd-body");const vvc=hasVV(id,rd.c)?(VVN_DATA[vvKey(id)]||{})[String(rd.c)]:null;
  body.className=(rd.tr?"":"hide-tr ")+(rd.gl?"":"hide-gl ")+(vvc&&rd.notes?"notes-on":"");
  const multi=ev.list.length>1;
  let anyLxx=false;
- const vs=ch.map((v,vi)=>{const vn=v[0];
+ const vs=ch.map(v=>{const vi=BK.c[rd.c-1].indexOf(v),vn=v[0];
   let orig="";
   if(o==="lxx"||(o==="heb"&&!v[1].length&&lx[vn])){const g=lx[vn];
    if(g){anyLxx=true;orig=`<div class="orig gr lxx">${g[2]?`<span class="gref">LXX ${esc(g[2])}</span>`:""}${lxxWords(g[1],vi)}</div>`}

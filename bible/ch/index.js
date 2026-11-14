@@ -1,1 +1,1 @@
-CHBOOKS=["ACT", "EXO", "GEN", "JHN", "LUK", "MAT", "MRK", "PS2", "PSA"];
+CHBOOKS=["ACT", "EXO", "GEN", "JHN", "LUK", "MAT", "MRK", "PS2", "PSA", "ROM"];
